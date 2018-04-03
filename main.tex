@@ -14,6 +14,7 @@
 \usepackage{listings}
 \newcommand{\RR}{\mathbb{R}}
 \DeclarePairedDelimiter\ip{\langle }{\rangle}
+\DeclareMathOperator{\proj}{proj}
 
 \setlength{\droptitle}{-10em}
 \title{Final report draft}
@@ -77,10 +78,35 @@ def radiance(ray):
 \end{lstlisting}
 Accordingly, the focus of this paper will be on intelligent sampling the input ray \(\bm i\) from this description.
 
-\subsection{Shading Introduction}
-Let \(\bm o\) be the unit outbound light direction vector, and let \(\bm i\) be the unit inbound light direction vector.
-Let \(\bm n\) be the normal vector.
+\subsection{Calculating reflected light}
 
+Until this point, the details of the interaction of light at the surface of an object have not been discussed.
+The optical properties of a material are defined exclusively by its bidirectional scattering distribution function or BSDF, notated \(f_s\).
+The BSDF is a function of four parameters:
+\begin{enumerate}
+\item \(\mathbf x\) the point in space at which the light hit the object
+\item \(\bm{\omega_o}\) the outbound radiance direction
+\item \(\bm{\omega_i}\) the inbound radiance direction
+\item \(\lambda\) the wavelength
+\end{enumerate}
+We will operate under the assumption that the BSDF remains uniform across the surface of an object.
+Thus, in the context of a specific material, there is no dependence on \(\mathbf x\).
+The output of the BSDF is the proportion of light reflected according to the given parameters.
+
+Physical materials often have the property that their BSDF is invariant as \(\bm{\omega_o}\) and \(\bm{\omega_i}\) are both rotated about the surface normal \(\bm n\).
+This is known as isotropy, and in this paper we will assume that all materials are isotropic.
+Therefore in practice, it is convenient to re-parameterize the BSDF in terms relative to the surface normal \(\bm n\).
+\begin{align*}
+  \theta_{\bm i} &= \cos^{-1} \ip{\bm{\omega_i}, \bm n}\\
+  \theta_{\bm o} &= \cos^{-1} \ip{\bm{\omega_o}, \bm n}\\
+  \phi_\Delta &= \cos^{-1}\del{\frac{\del{\bm{\omega_o} - \proj_{\bm n} \bm{\omega_o}} \cdot \del{\bm{\omega_i} - \proj_{\bm n} \bm{\omega_i}}}{\norm{\bm{\omega_o} - \proj_{\bm n} \bm{\omega_o}} \cdot \norm{\bm{\omega_i} - \proj_{\bm n} \bm{\omega_i}}}}
+\end{align*}
+Thus, \(f_s\) is a function of \(\theta_{\bm i}\), \(\theta_{\bm o}\), and \(\phi_\Delta\) where
+\begin{enumerate}
+\item \(\theta_{\bm i}\) is the angle off the normal of \(\bm{\omega_i}\)
+\item \(\theta_{\bm o}\) is the angle off the normal of \(\bm{\omega_o}\)
+\item \(\phi_\Delta\) is the angle between \(\bm{\omega_i}\) and \(\bm{\omega_o}\) about the axis of rotation defined by \(\bm n\)
+\end{enumerate}
 I am using the Fresnel formulation from PBRT.
 \begin{align*}
   r_{\parallel}^2 &= \frac{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} - 2\eta \cos \theta_{\bm i} + 1}{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} + 2\eta \cos \theta_{\bm i} + 1}\\
