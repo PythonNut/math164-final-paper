@@ -8,6 +8,8 @@
 \usepackage{titling}
 \usepackage{commath}
 \usepackage{mathtools}
+\usepackage{tabu}
+\usepackage{booktabs}
 \usepackage{bm}
 \newcommand{\RR}{\mathbb{R}}
 \DeclarePairedDelimiter\ip{\langle }{\rangle}
@@ -29,6 +31,19 @@ The goal of this project is to quantitatively compare the results of introducing
     
 \section{Methods}
 
+The physical basis for all raytracers is the rendering equation, which can be written as
+\[L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda, t) = L_{e}(\mathbf x, \bm{\omega_o}, \lambda, t) + \int_\Omega f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\ip{\bm n, \bm{\omega_i}} \dif \bm{\omega_i}\]
+
+where
+\begin{center}
+  \begin{tabu}{ll}
+    \(L_{o}\) is the outbound radiance & \(\bm{\omega_o}\) is the outbound radiance direction\\
+    \(L_{i}\) is the inbound radiance & \(\bm{\omega_i}\) is inbound radiance direction\\
+    \(L_{e}\) is the emission radiance & \(\mathbf x\) is a point in space\\
+    \(f_s\) bidirectional scattering distribution function & \(\lambda\) is the spectral wavelength\\
+    \(\Omega\) is the unit hemisphere around \(\bm n\) & \(\bm n\) is the surface normal at \(\mathbf x\).
+  \end{tabu}
+\end{center}
 Let \(\bm o\) be the unit outbound light direction vector, and let \(\bm i\) be the unit inbound light direction vector.
 Let \(\bm n\) be the normal vector.
 
