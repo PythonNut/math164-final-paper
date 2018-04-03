@@ -79,7 +79,7 @@ def radiance(ray):
 Accordingly, the focus of this paper will be on intelligent sampling the input ray \(\bm i\) from this description.
 
 \subsection{Calculating reflected light}
-
+\subsubsection{Defining the bidirectional scattering distribution function}
 Until this point, the details of the interaction of light at the surface of an object have not been discussed.
 The optical properties of a material are defined exclusively by its bidirectional scattering distribution function or BSDF, notated \(f_s\).
 The BSDF is a function of four parameters:
@@ -107,6 +107,12 @@ Thus, \(f_s\) is a function of \(\theta_{\bm i}\), \(\theta_{\bm o}\), and \(\ph
 \item \(\theta_{\bm o}\) is the angle off the normal of \(\bm{\omega_o}\)
 \item \(\phi_\Delta\) is the angle between \(\bm{\omega_i}\) and \(\bm{\omega_o}\) about the axis of rotation defined by \(\bm n\)
 \end{enumerate}
+
+\subsubsection{Integrating the BSDF with importance sampling}
+Returning to the rendering equation, we see that in general while path tracing we have no knowledge of the distribution of \(L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\).
+However, since we know the material properties, we have complete knowledge of the distribution of \(f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)\ip{\bm n, \bm{\omega_i}} = f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta)\cos \theta_{\bm i}\).
+Therefore, we can use the knowledge of the BSDF distribution to perform importance sampling of the light paths while path tracing, allowing the approximation to converge faster.
+
 I am using the Fresnel formulation from PBRT.
 \begin{align*}
   r_{\parallel}^2 &= \frac{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} - 2\eta \cos \theta_{\bm i} + 1}{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} + 2\eta \cos \theta_{\bm i} + 1}\\
