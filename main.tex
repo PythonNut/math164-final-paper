@@ -11,6 +11,7 @@
 \usepackage{tabu}
 \usepackage{booktabs}
 \usepackage{bm}
+\usepackage{listings}
 \newcommand{\RR}{\mathbb{R}}
 \DeclarePairedDelimiter\ip{\langle }{\rangle}
 
@@ -30,7 +31,7 @@ Ray tracing is a computer graphics technique that create images by tracing the p
 The goal of this project is to quantitatively compare the results of introducing importance sampling in a ray tracing model. Instead of picking a random direction for the next ray in the light path and calculating the BSDF, importance sampling lets the model to automatically select a direction based on how much it will contribute to the radiance, so the insignificant directions are selected less often, resulting in faster convergence rate of the image. In this project, we observe the convergence rate under direct sampling and importance sampling methods by comparing how fast the Frobenius norm of the difference between the converged image and an image generated given difference number of samples.
     
 \section{Methods}
-
+\subsection{Introduction: the rendering equation}
 The physical basis for all raytracers is the rendering equation, which can be written as\footnote{cite this}
 \[L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda, t) = L_{e}(\mathbf x, \bm{\omega_o}, \lambda, t) + \int_\Omega f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\ip{\bm n, \bm{\omega_i}} \dif \bm{\omega_i}\]
 
@@ -60,6 +61,22 @@ In this method, light rays start at the observer and bounce through the scene un
 This is the opposite of the normal intuition involving light, as photons themselves travel from light sources to the observer.
 However, due to Helmholtz reciprocity, the result is the same.
 The advantage of this method over tracing light from light sources to the observer is that it is easier to control the sampling distribution of rays with respect to the observer, which generally leads to more straightforward convergence.
+
+The path tracing algorithm can be described by the following highly simplified psuedo code
+\begin{lstlisting}
+def radiance(ray):
+    if the recursion depth is above a certain threshold:
+        return black
+    if the ray does not hit an object in the scene:
+        return black
+    let obj be the object hit by the ray
+    let i be a randomly sampled input ray
+    let r be radiance(i)
+    add the emission of obj to r
+    calculate the spectral output given ray, i, and r
+\end{lstlisting}
+Accordingly, the focus of this paper will be on intelligent sampling the input ray \(\bm i\) from this description.
+
 \subsection{Shading Introduction}
 Let \(\bm o\) be the unit outbound light direction vector, and let \(\bm i\) be the unit inbound light direction vector.
 Let \(\bm n\) be the normal vector.
