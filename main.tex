@@ -31,7 +31,7 @@ The goal of this project is to quantitatively compare the results of introducing
     
 \section{Methods}
 
-The physical basis for all raytracers is the rendering equation, which can be written as
+The physical basis for all raytracers is the rendering equation, which can be written as\footnote{cite this}
 \[L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda, t) = L_{e}(\mathbf x, \bm{\omega_o}, \lambda, t) + \int_\Omega f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\ip{\bm n, \bm{\omega_i}} \dif \bm{\omega_i}\]
 
 where
@@ -54,8 +54,12 @@ For scenes of any reasonable complexity, this produces a system that is too comp
 
 Therefore, it is appropriate to compute an approximate solution to the rendering equation using Monte Carlo methods.
 Raytracers operate by explicitly tracing light paths through the scene.
-By averaging over enough paths, they can produce a highly accurate approximate solution to the rendering equation.
-
+By averaging over enough paths, they can produce a highly accurate approximate solutions to the rendering equation.
+In this paper, we have chosen to implement forward path tracing.
+In this method, light rays start at the observer and bounce through the scene until they encounter a light.
+This is the opposite of the normal intuition involving light, as photons themselves travel from light sources to the observer.
+However, due to Helmholtz reciprocity, the result is the same.
+The advantage of this method over tracing light from light sources to the observer is that it is easier to control the sampling distribution of rays with respect to the observer, which generally leads to more straightforward convergence.
 \subsection{Shading Introduction}
 Let \(\bm o\) be the unit outbound light direction vector, and let \(\bm i\) be the unit inbound light direction vector.
 Let \(\bm n\) be the normal vector.
