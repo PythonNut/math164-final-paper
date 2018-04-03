@@ -113,6 +113,41 @@ Returning to the rendering equation, we see that in general while path tracing w
 However, since we know the material properties, we have complete knowledge of the distribution of \(f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)\ip{\bm n, \bm{\omega_i}} = f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta)\cos \theta_{\bm i}\).
 Therefore, we can use the knowledge of the BSDF distribution to perform importance sampling of the light paths while path tracing, allowing the approximation to converge faster.
 
+\subsection{Example: Lambertian Diffuse BSDF}
+\subsubsection{BSDF description}
+Perhaps the simplest possible BSDF is the Lambertian Diffuse BSDF, which describes an ideal diffuse surface.
+\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \frac{\rho_d}{\pi}\]
+where \(\rho_d \in \intcc{0,1}\) is the albedo, or normal reflectance of the material.
+Thus, the Lambertian BSDF describes completely uniform scattering of light in all directions.
+In general, we will assume that diffuse surfaces do not emit light.
+Therefore, substitution into the rendering equation yields
+\begin{align*}
+  L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda)
+  &= \rho_d \int_\Omega \frac{1}{\pi} L_i(\mathbf x, \bm{\omega_i}, \lambda)\cos\theta_{\bm i} \dif \bm{\omega_i}\\
+  &= \rho_d \int_\Omega \frac{1}{\pi} L_i(\mathbf x, \bm{\omega_i}, \lambda)\cos\theta_{\bm i} \sin\theta_{\bm i}\dif \theta_{\bm i} \dif \phi.
+\end{align*}
+Thus, we are interested in importance sampling with respect to the PDF
+\[P(\theta_{\bm i}, \phi_\Delta) = \frac{1}{\pi}\cos \theta_{\bm i}\sin \theta_{\bm i} = \frac{\sin 2\theta_{\bm i}}{2\pi}\]
+\subsubsection{Importance sampling derivation}
+Since the BSDF is isotropic, we can ignore \(\phi_\Delta\) completely, and sample purely with respect to \(\theta_{\bm i}\).
+Therefore, we can define the PDF with respect to \(\theta_{\bm i}\) only as
+\[P(\theta_{\bm i}) = \int_0^{2\pi} P(\theta_{\bm i}, \phi)\dif \phi = \int_0^{2\pi} \frac{\sin 2\theta_{\bm i}}{2\pi} \dif \phi = \sin 2\theta_{\bm i}\]
+Now, we can find the CDF of the distribution like so
+\begin{align*}
+  F(\theta_{\bm i})
+  &= \int_0^{\theta_{\bm i}} P(\theta) \dif \theta && \text{definition of CDF}\\
+  &= \int_0^{\theta_{\bm i}} \sin 2\theta \dif \theta && \text{substitute}\\
+  &= -\frac{1}{2}\cos 2\theta_{\bm i} + \frac{1}{2} && \text{integrate}\\
+  &= \sin^2 \theta_{\bm i} && \text{trig identity}
+\end{align*}
+Now, letting \(\xi_\theta \sim \mathcal{U}(0, 1)\) and inverting the CDF with respect to \(\xi_\theta\) yields
+\begin{align*}
+  \xi_\theta &= F(\theta_{\bm i}) && \text{setup for CDF inversion}\\
+  \xi_\theta &= \sin^2 \theta_{\bm i} && \text{substitute}\\
+  \theta_{\bm i} &= \sin^{-1}\sqrt{\xi_\theta} && \text{solve for \(\theta_{\bm i}\)}
+\end{align*}
+And finally from our isotropy assumption,
+\[\phi_\Delta = 2\pi\xi_\phi \]
 I am using the Fresnel formulation from PBRT.
 \begin{align*}
   r_{\parallel}^2 &= \frac{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} - 2\eta \cos \theta_{\bm i} + 1}{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} + 2\eta \cos \theta_{\bm i} + 1}\\
