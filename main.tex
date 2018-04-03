@@ -44,6 +44,19 @@ where
     \(\Omega\) is the unit hemisphere around \(\bm n\) & \(\bm n\) is the surface normal at \(\mathbf x\).
   \end{tabu}
 \end{center}
+Since we are rendering only still images, we can ignore the dependence on time, yielding
+\[L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda) = L_{e}(\mathbf x, \bm{\omega_o}, \lambda) + \int_\Omega f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda)L_i(\mathbf x, \bm{\omega_i}, \lambda)\ip{\bm n, \bm{\omega_i}} \dif \bm{\omega_i}.\]
+
+Solving the rendering equation for a given set of objects is the main task in accurate rendering algorithms.
+However, the equation is recursive, as the outbound radiance at one point may become the inbound radiance at another.
+Thus, a realistic solution to the rendering equation requires integrating over all possible paths light may take within a scene.
+For scenes of any reasonable complexity, this produces a system that is too complex to be solved analytically.
+
+Therefore, it is appropriate to compute an approximate solution to the rendering equation using Monte Carlo methods.
+Raytracers operate by explicitly tracing light paths through the scene.
+By averaging over enough paths, they can produce a highly accurate approximate solution to the rendering equation.
+
+\subsection{Shading Introduction}
 Let \(\bm o\) be the unit outbound light direction vector, and let \(\bm i\) be the unit inbound light direction vector.
 Let \(\bm n\) be the normal vector.
 
