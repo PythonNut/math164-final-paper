@@ -23,7 +23,14 @@
     
 \section{Methods}
 
+Let \(\bm o\) be the unit outbound light direction vector, and let \(\bm i\) be the unit inbound light direction vector.
+Let \(\bm n\) be the normal vector.
 
+I am using the Fresnel formulation from PBRT.
+\begin{align*}
+  r_{\parallel}^2 &= \frac{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} - 2\eta \cos \theta_{\bm i} + 1}{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} + 2\eta \cos \theta_{\bm i} + 1}\\
+  r_{\perp}^2 &= \frac{\del{\eta^2 + \kappa^2} - 2\eta \cos \theta_{\bm i} + \cos^2 \theta_{\bm i}}{\del{\eta^2 + \kappa^2} + 2\eta \cos \theta_{\bm i} + \cos^2 \theta_{\bm i}}
+\end{align*}
 
 \section{Results}
 
