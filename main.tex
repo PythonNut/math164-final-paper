@@ -23,13 +23,13 @@
 
 \maketitle
 \begin{abstract}
-
+This report presents utilising importance sampling techniques for Monte Carlo integration in the context of designing a ray tracer. The rendered images are compared quantitatively to determine which techniques result in faster convergence rates. The ray-tracing rendering equation, ray reflection calculation and detailed mathematical implementation for the importance sampling techniques are discussed in the methods section. Finally, the report concludes with a summary of the results and discussion for future work.
 \end{abstract}
 
 \section{Introduction}
-Ray tracing is a computer graphics technique that creates images by tracing the path of light from a pixel as it intersects with the objects in the scene, and calculate how much light is reflected back along the ray to determine the color of the pixel. Figure 1 illustrate the fundamental precess of ray tracing.
+Ray tracing is a computer graphics technique that creates images by tracing the path of light from a pixel as it intersects with the objects in the scene, the ray tracer calculates how much light is reflected back along the ray to determine the color of the pixel. Figure 1 illustrate the precess of ray tracing. \newline
 
-The goal of this project is to quantitatively compare the results of introducing importance sampling in a ray tracing model. Instead of picking a random direction for the next ray in the light path and calculating the BSDF, importance sampling lets the model to automatically select a direction based on how much it will contribute to the radiance, so the insignificant directions are selected less often, resulting in faster convergence rate of the image. In this project, we observe the convergence rate under direct sampling and importance sampling methods by comparing how fast the Frobenius norm of the difference between the converged image and an image generated given difference number of samples.
+The goal of this project is to quantitatively compare the results of introducing importance sampling in a ray tracing model. Instead of picking a random direction for the next ray in the light path, importance sampling lets the model  automatically select a direction based on how much it will contribute to the radiance, so the insignificant directions are selected less often, resulting in faster convergence rate of the image. In this project, we compare the convergence rate under direct sampling and importance sampling methods by plotting the Frobenius norms of the differences between the converged matrix and rendered matrices.\newline
     
 \section{Methods}
 \subsection{Introduction: the rendering equation}
@@ -155,6 +155,9 @@ I am using the Fresnel formulation from PBRT.
 \end{align*}
 
 \section{Results}
+The scene we have rendered consists of a collection of spheres with diffusely reflecting surfaces. The overhead light source is configured to emit light while the other surfaces have Lambertian reflectance properties.\newline
+result under 20 samples/pixel (with and without IS):\newline 
+result under 100 samples/pixel (with and without IS):\newline 
 
 \section{Discussion}
 
