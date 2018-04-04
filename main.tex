@@ -11,6 +11,7 @@
 \usepackage{tabu}
 \usepackage{booktabs}
 \usepackage{bm}
+\usepackage{xfrac}
 \usepackage{listings}
 \newcommand{\RR}{\mathbb{R}}
 \DeclarePairedDelimiter\ip{\langle }{\rangle}
@@ -124,7 +125,7 @@ Therefore, substitution into the rendering equation yields
 \begin{align*}
   L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda)
   &= \rho_d \int_\Omega \frac{1}{\pi} L_i(\mathbf x, \bm{\omega_i}, \lambda)\cos\theta_{\bm i} \dif \bm{\omega_i}\\
-  &= \rho_d \int_\Omega \frac{1}{\pi} L_i(\mathbf x, \bm{\omega_i}, \lambda)\cos\theta_{\bm i} \sin\theta_{\bm i}\dif \theta_{\bm i} \dif \phi.
+  &= \rho_d \int_0^{2\pi}\int_0^{\sfrac{\pi}{2}} \frac{1}{\pi} L_i(\mathbf x, \bm{\omega_i}, \lambda)\cos\theta_{\bm i} \sin\theta_{\bm i}\dif \theta_{\bm i} \dif \phi_\Delta.
 \end{align*}
 Thus, we are interested in importance sampling with respect to the PDF
 \[P(\theta_{\bm i}, \phi_\Delta) = \frac{1}{\pi}\cos \theta_{\bm i}\sin \theta_{\bm i} = \frac{\sin 2\theta_{\bm i}}{2\pi}\]
@@ -282,6 +283,66 @@ The Smith shadow masking correction is incorporated into the BSDF in the same wa
 Thus the BSDF becomes
 \[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_sF(\theta_{\bm i})D\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}G\del{\bm{\omega_i}, \bm{\omega_o}, \frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}.\]
 
+\subsubsection{Importance sampling derivation}
+
+Importance sampling is especially suitable for glossy surfaces, as the distribution of inbound light is highly nonuniform.
+In fact, in the limit as \(\alpha \to 0\) we see that the distribution collapses towards a Dirac delta function.
+However, sampling is not trivial as it was for ideal reflectors, as the light distribution caused by variation in the microfacet normals is complex.
+
+In order to simplify our calculations, we will assume that \(D\) is the main contributor to the shape of the BSDF.
+This allows us to sample in terms of the microfacet normal \(\bm m\).
+To use this sampling we can transform from \(\bm{\omega_o}\) and \(\bm{\omega_i}\) to \(\bm m\) and back.
+
+Recall the Trowbridge-Reitz microfacet distribution function
+\[D(\bm m) = \frac{\alpha^2 \chi^+(\ip{\bm m, \bm n})}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}.\]
+Substituting this into the rendering equation, and solving for \(\omega_i\) in terms of \(\bm m\) yields
+\begin{align*}
+  L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda)
+  &= \int_\Omega D(\bm m) L_i(\mathbf x, 2\abs{\ip{\bm{\omega_o}, \bm n}}\bm n-  \bm{\omega_o}, \lambda)\cos\theta_{\bm m} \dif \bm{m}\\
+  &= \int_\Omega \frac{\alpha^2 \cos\theta_{\bm m} }{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}\cdot L_i(\mathbf x, 2\abs{\ip{\bm{\omega_o}, \bm n}}\bm n-  \bm{\omega_o}, \lambda) \dif \bm{m}\\
+  &= \int_0^{2\pi}\int_0^{\sfrac{\pi}{2}} \frac{\alpha^2 \cos\theta_{\bm m} \sin\theta_{\bm m}}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}\cdot L_i(\mathbf x, 2\abs{\ip{\bm{\omega_o}, \bm n}}\bm n-  \bm{\omega_o}, \lambda)\dif\theta_{\bm m}\dif\phi_\Delta\\
+\end{align*}
+Accordingly, we wish to sample the PDF
+\[P_{\bm m}(\theta_{\bm m}, \phi_\Delta) = \frac{\alpha^2 \cos\theta_{\bm m} \sin\theta_{\bm m}}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2} .\]
+As in the Lambertian diffuse the BSDF is isotropic, we can ignore \(\phi_\Delta\) completely, and sample purely with respect to \(\theta_{\bm i}\).
+Therefore, we can define the PDF with respect to \(\theta_{\bm i}\) only as
+\[P_{\bm m}(\theta_{\bm m}) = \int_0^{2\pi}\frac{\alpha^2 \cos\theta_{\bm m} \sin\theta_{\bm m}}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}\dif\phi_\Delta = \frac{2\alpha^2 \cos\theta_{\bm m} \sin\theta_{\bm m}}{\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}.\]
+Next, we find the CDF of the distribution like so
+\begin{align*}
+  F_{\bm m}(\theta_{\bm m})
+  &= \int_0^{\theta_{\bm m}} P(\theta)\dif\theta && \text{definition of CDF}\\
+  &= \int_0^{\theta_{\bm m}} \frac{2\alpha^2 \cos\theta \sin\theta}{\del{\del{\alpha^2 - 1}\cos^2 \theta + 1}^2}\dif\theta && \text{substitute}\\
+  &= \int_{\del{\alpha^2 - 1}\cos^20 + 1}^{\del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1} -\frac{\alpha^2}{\del{\alpha^2 - 1} u^2}\dif\theta && \begin{cases}
+    \begin{aligned}
+      u &= \del{\alpha^2 - 1}\cos^2\theta + 1\\
+      \dif u &= -2\del{\alpha^2 - 1}\sin \theta \cos \theta \dif \theta
+    \end{aligned}
+  \end{cases} \\
+  &= -\frac{\alpha^2}{\alpha^2 - 1} \int_{\alpha^2}^{\del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1} \frac{1}{u^2}\dif\theta && \text{simplify}\\
+  &= -\frac{\alpha^2}{\alpha^2 - 1} \left[ -\frac{1}{u} \right]_{\alpha^2}^{\del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1} && \text{integrate}\\
+  &= \frac{\alpha^2}{\alpha^2 - 1}  \del{\frac{1}{\del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1} - \frac{1}{\alpha^2}}  && \text{substitute}
+\end{align*}
+Now, letting \(\xi_\theta \sim \mathcal{U}(0, 1)\) and inverting the CDF with respect to \(\xi_\theta\) yields
+\begin{align*}
+  \xi_\theta &= \frac{\alpha^2}{\alpha^2 - 1}  \del{\frac{1}{\del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1} - \frac{1}{\alpha^2}}\\
+  \frac{\xi_\theta\del{\alpha^2 - 1}}{\alpha^2} + \frac{1}{\alpha^2}&= \frac{1}{\del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1}\\
+  \del{\alpha^2 - 1}\cos^2\theta_{\bm m} + 1&= \frac{\alpha^2}{\xi_\theta\del{\alpha^2 - 1} + 1}\\
+  \cos^2\theta_{\bm m}&= \frac{\alpha^2}{\del{\alpha^2 - 1}\del{\xi_\theta\del{\alpha^2 - 1} + 1}} - \frac{1}{\del{\alpha^2 - 1}}\\
+  \cos^2\theta_{\bm m}&= \frac{\alpha^2}{\del{\alpha^2 - 1}\del{\xi_\theta\del{\alpha^2 - 1} + 1}} - \frac{\xi_\theta\del{\alpha^2 - 1} + 1}{\del{\alpha^2 - 1}\del{\xi_\theta\del{\alpha^2 - 1} + 1}}\\
+  \cos^2\theta_{\bm m}&= \frac{ - \xi_\theta\del{\alpha^2 - 1} + \del{\alpha^2 - 1}}{\del{\alpha^2 - 1}\del{\xi_\theta\del{\alpha^2 - 1} + 1}}\\
+  \cos^2\theta_{\bm m}&= \frac{1- \xi_\theta}{\del{\xi_\theta\del{\alpha^2 - 1} + 1}}\\
+  \theta_{\bm m}&= \cos^{-1}\del{\frac{1- \xi_\theta}{\del{\xi_\theta\del{\alpha^2 - 1} + 1}}}\\
+\end{align*}
+And finally from our isotropy assumption we draw \(\xi_\phi \sim \mathcal{U}(0, 1)\).
+Then
+\[\phi_\Delta = 2\pi\xi_\phi .\]
+Since we are sampling \(\bm m\), in practice we will sample a microfacet normal \( \bm m\) then convert it to an inbound light direction with
+\[2\abs{\ip{\bm{\omega_o}, \bm n}}\bm n-  \bm{\omega_o}\]
+To calculate the PDF of an inbound light direction, we must use the Jacobin of the transform like so
+\begin{align*}
+  P(\omega_{\bm i}) &= P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} } \norm{\dpd{\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}}{\bm{\omega_o}}}\\
+   &= \frac{1}{4\abs{\ip{\bm{\omega_i}, \bm n}\ip{\bm{\omega_o}, \bm n}}}P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} }
+\end{align*}
 \section{Results}
 The scene we have rendered consists of a collection of spheres with diffusely reflecting surfaces. The overhead light source is configured to emit light while the other surfaces have Lambertian reflectance properties.\newline
 result under 20 samples/pixel (with and without IS):\newline 
