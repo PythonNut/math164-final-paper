@@ -146,12 +146,63 @@ Now, letting \(\xi_\theta \sim \mathcal{U}(0, 1)\) and inverting the CDF with re
   \xi_\theta &= \sin^2 \theta_{\bm i} && \text{substitute}\\
   \theta_{\bm i} &= \sin^{-1}\sqrt{\xi_\theta} && \text{solve for \(\theta_{\bm i}\)}
 \end{align*}
-And finally from our isotropy assumption,
-\[\phi_\Delta = 2\pi\xi_\phi \]
-I am using the Fresnel formulation from PBRT.
+And finally from our isotropy assumption we draw \(\xi_\phi \sim \mathcal{U}(0, 1)\).
+Then
+\[\phi_\Delta = 2\pi\xi_\phi .\]
+
+\subsection{Example: Trowbridge-Reitz Microfacet Glossy BSDF}
+
+\subsubsection{Ideal mirrors}
+
+The direct opposite of a ideal diffuse surface is a ideal reflecting surface, or mirror.
+While the BSDF of an ideal diffuse surface is uniform, the BSDF for an ideal mirror is a double Dirac delta function
+\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_s \delta(\theta_{\bm i} - \theta_{\bm o})\delta(\phi_\Delta + \pi).\]
+where \(\rho_s \in \intcc{0, 1}\) is the specular albedo.
+Thus, no sampling of the BSDF is needed, as \(\bm{\omega_i}\) is uniquely determined by
+\[\bm{\omega_i} = 2\abs{\ip{\bm{\omega_o}, \bm n}}\bm n-  \bm{\omega_o}.\]
+However in practice very few real materials can be accurately approximated by ideal reflectors.
+Therefore, there exist several modifications to the BSDF which yield more accurate results.
+
+\subsubsection{Fresnel conditions}
+
+In general, glossy surfaces do not reflect all incident light.
+In the case of dielectric materials, some light may be transmitted internally.
+In the case of conductors, incident light may be converted into heat.
+\[F(\theta_{\bm i}) = \frac{r_{\parallel}^2 + r_{\perp}^2}{2}\]
+where
+\begin{align*}
+  r_{\parallel} &= \norm{\frac{n_1 \cos \theta_{\bm i} - n_2 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2}}{n_1 \cos \theta_{\bm i} + n_2 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2}}}\\
+  r_{\perp} &= \norm{\frac{n_1 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2} - n_2\cos \theta_{\bm i}}{n_1 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2} + n_2 \cos \theta_{\bm i}}}
+\end{align*}
+In our case, we will make the assumption that the metal is surrounded by air, so \(n_1 = 1\).
+This allows is to simplify to
+\begin{align*}
+  r_{\parallel} &= \norm{\frac{\cos \theta_{\bm i} - n_2 \sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2}}{\cos \theta_{\bm i} + n_2 \sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2}}}\\
+  r_{\perp} &= \norm{\frac{\sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2} - n_2\cos \theta_{\bm i}}{\sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2} + n_2 \cos \theta_{\bm i}}}.
+\end{align*}
+The index of refraction of metals is canonically represented as \(n_2 = \eta + i\kappa\) where \(\eta\) is the traditional refractive index, and \(\kappa\) is the extinction coefficient.
+Substituting this yields
+\begin{align*}
+  r_{\parallel} &= \norm{\frac{\cos \theta_{\bm i} - \del{\eta + i\kappa} \sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2}}{\cos \theta_{\bm i} + \del{\eta + i\kappa} \sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2}}}\\
+  r_{\perp} &= \norm{\frac{\sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2} - \del{\eta + i\kappa}\cos \theta_{\bm i}}{\sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2} + \del{\eta + i\kappa} \cos \theta_{\bm i}}}.
+\end{align*}
+Now, we make the simplifying assumption that \(\eta^2 + \kappa^2 \gg 1\). Then we have
+\[\sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2} \approx 1\]
+This allows us to approximate the terms by
+\begin{align*}
+  r_{\parallel}^2 &\approx \norm{\frac{\cos \theta_{\bm i} - \del{\eta + i\kappa}}{\cos \theta_{\bm i} + \del{\eta + i\kappa}}}^2\\
+  r_{\perp}^2 &\approx \norm{\frac{1 - \del{\eta + i\kappa}\cos \theta_{\bm i}}{1 + \del{\eta + i\kappa} \cos \theta_{\bm i}}}^2.
+\end{align*}
+We can then expand the complex norm like so
+\begin{align*}
+  r_{\parallel}^2 &= \frac{\del{\cos \theta_{\bm i} - \del{\eta + i\kappa}}\del{\cos \theta_{\bm i} - \del{\eta - i\kappa}}}{\del{\cos \theta_{\bm i} + \del{\eta + i\kappa}}\del{\cos \theta_{\bm i} + \del{\eta - i\kappa}}}\\
+  r_{\perp}^2 &= \frac{\del{1 - \del{\eta + i\kappa}\cos \theta_{\bm i}}\del{1 - \del{\eta - i\kappa}\cos \theta_{\bm i}}}{\del{1 + \del{\eta + i\kappa} \cos \theta_{\bm i}}\del{1 + \del{\eta - i\kappa} \cos \theta_{\bm i}}}.
+\end{align*}
+Simplifying yields
 \begin{align*}
   r_{\parallel}^2 &= \frac{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} - 2\eta \cos \theta_{\bm i} + 1}{\del{\eta^2 + \kappa^2}\cos^2 \theta_{\bm i} + 2\eta \cos \theta_{\bm i} + 1}\\
-  r_{\perp}^2 &= \frac{\del{\eta^2 + \kappa^2} - 2\eta \cos \theta_{\bm i} + \cos^2 \theta_{\bm i}}{\del{\eta^2 + \kappa^2} + 2\eta \cos \theta_{\bm i} + \cos^2 \theta_{\bm i}}
+  r_{\perp}^2 &= \frac{\del{\eta^2 + \kappa^2} - 2\eta \cos \theta_{\bm i} + \cos^2 \theta_{\bm i}}{\del{\eta^2 + \kappa^2} + 2\eta \cos \theta_{\bm i} + \cos^2 \theta_{\bm i}}\\
+  F(\theta_{\bm i}) &= \frac{r_{\parallel}^2 + r_{\perp}^2}{2}.
 \end{align*}
 
 \section{Results}
