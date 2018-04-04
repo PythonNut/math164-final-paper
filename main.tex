@@ -230,6 +230,7 @@ where
 \begin{enumerate}
 \item \(D(\bm m)\) is the probability density of the microfacet distribution with normal vector \(\bm m\)
 \item \(\chi^+(x)\) is the positive characteristic function, which is \(1\) if \(x>0\) and \(0\) otherwise
+\item \(\theta_{\bm m}\) is the angle between the macrosurface normal \(\bm n\) and \(\bm m\)
 \item \(\alpha > 0\) is the width parameter, which characterizes the amount of surface roughness.
 \end{enumerate}
 Note that, in the limiting case \(\alpha \to 0\), then if \(\bm m \neq \bm n\) we have
@@ -256,10 +257,31 @@ The microfacet normal can solved for like so
 \begin{align*}
   \bm{\omega_i} &= 2\abs{\ip{\bm{\omega_o}, \bm m}}\bm m-  \bm{\omega_o} && \text{ideal reflection formula}\\
   \bm m &= \frac{\bm{\omega_i} + \bm{\omega_o}}{2\abs{\ip{\bm{\omega_o}, \bm n}}} && \text{solve for \(\bm m\)}\\
-  \bm m &= \frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} && \text{normalize}
+  \bm m &= \frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} && \text{alternative normalization}
 \end{align*}
 Therefore, the microfacet distribution can be incorporated into the BSDF as
-\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_sF(\theta_{\bm i})D\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}\]
+\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_sF(\theta_{\bm i})D\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}.\]
+
+\subsubsection{Smith microfacet shadow masking}
+
+Since it is physically reasonable to consider microfacets as being part of a continuous surface, then it is possible to model the surface in the neighborhood of a point as being defined by some height function \(z = f(x, y)\).
+However, these microscopic differences in height will cause the surface micro geometry to cast shadows on itself, thus it is possible for a ray \( \bm r\) to intersect with multiple micro facets.
+To avoid double-counting, we must employ a corrective term.
+This term is known as the shadow masking function, \(G(\bm{\omega_i}, \bm{\omega_o}, \bm m)\), which describes what proportion of the micro facets with normal \(\bm m\) are visible simultaneously from directions \(\bm{\omega_i}\) and \(\bm{\omega_o}\).
+The Smith shadow masking function approximates \(G\) as the separable product two monodirectional masking terms
+\[G(\bm{\omega_i}, \bm{\omega_o}, \bm m) = G_1(\bm{\omega_i}, \bm m)G_1(\bm{\omega_i}, \bm m)\]
+The Smith shadow masking term is dependent on the microfacet distribution, \(D\).
+For the Trowbridge-Reitz distribution, \(G_1\) takes the form
+\[G_1(\bm v, \bm m) = \chi^2\del{\frac{\ip{\bm v, \bm m}}{\ip{\bm v, \bm n}}} \frac{2}{1 + \sqrt{1 + \alpha^2 \tan^2{\theta_{\bm v}}}}\]
+where
+\begin{enumerate}
+\item \(\bm v\) is the viewing direction (may be either \(\bm{\omega_o}\) or \(\bm{\omega_i}\))
+\item \(\theta_{\bm v}\) is the angle between the macrosurface normal \(\bm n\) and \(\bm m\).
+\end{enumerate}
+The Smith shadow masking correction is incorporated into the BSDF in the same way as the microfacet distribution function.
+Thus the BSDF becomes
+\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_sF(\theta_{\bm i})D\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}G\del{\bm{\omega_i}, \bm{\omega_o}, \frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}.\]
+
 \section{Results}
 The scene we have rendered consists of a collection of spheres with diffusely reflecting surfaces. The overhead light source is configured to emit light while the other surfaces have Lambertian reflectance properties.\newline
 result under 20 samples/pixel (with and without IS):\newline 
