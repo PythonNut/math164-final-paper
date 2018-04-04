@@ -167,14 +167,21 @@ Therefore, there exist several modifications to the BSDF which yield more accura
 
 In general, glossy surfaces do not reflect all incident light.
 In the case of dielectric materials, some light may be transmitted internally.
-In the case of conductors, incident light may be converted into heat.
+In the case of conductors, incident light may be absorbed and converted into heat.
+This phenomenon is described by the Fresnel term \(F(\theta_{\bm i})\) which calculates the fraction of reflected light as a function of the inbound angle.
+It takes the form
 \[F(\theta_{\bm i}) = \frac{r_{\parallel}^2 + r_{\perp}^2}{2}\]
 where
 \begin{align*}
   r_{\parallel} &= \norm{\frac{n_1 \cos \theta_{\bm i} - n_2 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2}}{n_1 \cos \theta_{\bm i} + n_2 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2}}}\\
   r_{\perp} &= \norm{\frac{n_1 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2} - n_2\cos \theta_{\bm i}}{n_1 \sqrt{1 - \del{\frac{n_1}{n_2}\sin \theta_{\bm i}}^2} + n_2 \cos \theta_{\bm i}}}
 \end{align*}
-In our case, we will make the assumption that the metal is surrounded by air, so \(n_1 = 1\).
+and
+\begin{enumerate}
+\item \(n_1\) is the complex index of refraction of the external medium
+\item \(n_2\) is the complex index of refraction of the external medium
+\end{enumerate}
+In our case, we will make the assumption that the metal is surrounded by air, so \(n_1 \approx 1\).
 This allows is to simplify to
 \begin{align*}
   r_{\parallel} &= \norm{\frac{\cos \theta_{\bm i} - n_2 \sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2}}{\cos \theta_{\bm i} + n_2 \sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2}}}\\
@@ -205,6 +212,54 @@ Simplifying yields
   F(\theta_{\bm i}) &= \frac{r_{\parallel}^2 + r_{\perp}^2}{2}.
 \end{align*}
 
+This is the Fresnel approximation we use in our raytracer.
+Additionally, this is equivalent to the Fresnel approximation used in the PBRT raytracer.
+The Fresnel term is then incorporated into the BSDF directly as
+\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_s \delta(\theta_{\bm i} - \theta_{\bm o})\delta(\phi_\Delta + \pi)F(\theta_{\bm i})\]
+
+\subsubsection{Trowbridge-Reitz microfacet distribution}
+
+In addition to changes in the amount of reflected light, many surfaces exhibit blurred reflection due to surface scattering.
+This is due to microscopic variation in the surface.
+Therefore, the surface can be though of as consisting many tiny facets, each of which acts as its own ideal reflector, called microfacets.
+Many competing models for the distribution of orientations of the microfacet normals exist.
+We have chosen to implement the Trowbridge-Reitz microfacet distribution, which was shown to produce visually accurate results in \footnote{cite EGSR07}.
+It takes the form
+\[D(\bm m) = \frac{\alpha^2 \chi^+(\ip{\bm m, \bm n})}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}.\]
+where
+\begin{enumerate}
+\item \(D(\bm m)\) is the probability density of the microfacet distribution with normal vector \(\bm m\)
+\item \(\chi^+(x)\) is the positive characteristic function, which is \(1\) if \(x>0\) and \(0\) otherwise
+\item \(\alpha > 0\) is the width parameter, which characterizes the amount of surface roughness.
+\end{enumerate}
+Note that, in the limiting case \(\alpha \to 0\), then if \(\bm m \neq \bm n\) we have
+\begin{align*}
+  \lim_{\alpha \to 0^+}D(\bm m)
+  &= \lim_{\alpha \to 0^+}\frac{\alpha^2 \chi^+(\ip{\bm m, \bm n})}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}\\
+  &= \frac{ \chi^+(\ip{\bm m, \bm n})}{\pi}\lim_{\alpha \to 0^+}\frac{\alpha^2}{\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2} && \text{simplify}\\
+  &= 0
+\end{align*}
+Since \(\alpha^2\) goes to \(0\), but \(\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1\) must go to some positive number since \(0 \leq \cos\theta_{\bm m} < 1\).
+On the other hand, if \(\bm m = \bm n\) then
+\begin{align*}
+  \lim_{\alpha \to 0}D(\bm m)
+  &= \lim_{\alpha \to 0^+}\frac{\alpha^2}{\pi\del{\del{\alpha^2 - 1} + 1}^2} && \text{since \(\ip{\bm m, \bm n} = \cos \theta_{\bm m} = 1\)}\\
+  &= \frac{1}{\pi}\lim_{\alpha \to 0^+}\frac{1}{\alpha^2} && \text{simplify}\\
+  &= +\infty
+\end{align*}
+Thus, the Trowbridge-Reitz microfacet distribution reproduces the Dirac delta behavior of an ideal reflector in the limit \(\alpha \to 0\).
+
+Note that the probability distribution describes the distribution of the normal vectors.
+To make this useful, we must calculate the microfacet normal given \(\bm{\omega_i}\) and \(\bm{\omega_o}\).
+Fortunately, this is easy to do when the microfacet is an ideal reflector.
+The microfacet normal can solved for like so
+\begin{align*}
+  \bm{\omega_i} &= 2\abs{\ip{\bm{\omega_o}, \bm m}}\bm m-  \bm{\omega_o} && \text{ideal reflection formula}\\
+  \bm m &= \frac{\bm{\omega_i} + \bm{\omega_o}}{2\abs{\ip{\bm{\omega_o}, \bm n}}} && \text{solve for \(\bm m\)}\\
+  \bm m &= \frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} && \text{normalize}
+\end{align*}
+Therefore, the microfacet distribution can be incorporated into the BSDF as
+\[f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta) = \rho_sF(\theta_{\bm i})D\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}\]
 \section{Results}
 The scene we have rendered consists of a collection of spheres with diffusely reflecting surfaces. The overhead light source is configured to emit light while the other surfaces have Lambertian reflectance properties.\newline
 result under 20 samples/pixel (with and without IS):\newline 
