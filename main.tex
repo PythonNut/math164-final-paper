@@ -19,7 +19,11 @@
 \DeclareMathOperator{\proj}{proj}
 \usepackage{subcaption}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{subcaption}
 
+\usetikzlibrary{quotes, angles, intersections}
 \setlength{\droptitle}{-10em}
 \title{Final report draft}
 \author{Jonathan Hayase\and Anqi He}
@@ -105,10 +109,40 @@ The output of the BSDF is the proportion of light reflected according to the giv
 Physical materials often have the property that their BSDF is invariant as \(\bm{\omega_o}\) and \(\bm{\omega_i}\) are both rotated about the surface normal \(\bm n\).
 This is known as isotropy, and in this paper we will assume that all materials are isotropic.
 Therefore in practice, it is convenient to re-parameterize the BSDF in terms relative to the surface normal \(\bm n\).
+\begin{figure}[H]
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \filldraw[color = gray!40, draw=black] (-1,-1) -- (1,-1) -- (1,1) -- (-1, 1) -- cycle;
+      \draw[->] (0,0) coordinate (o) -- (-1.3,1.1) coordinate (wi) node[pos=1.15] {\(\bm{\omega_i}\)};
+      \draw[->] (0,0)  --(1.4,1) coordinate (wo) node [pos=1.15] {\(\bm{\omega_o}\)};
+      \node (0,0) [below] {\(\bm n\)};
+      \filldraw (0,0) circle (1pt);
+      \draw pic["$\phi_\Delta$",draw=black,angle eccentricity=2,angle radius=0.3cm] {angle=wo--o--wi};
+    \end{tikzpicture}
+    \caption{Definition of \(\phi_\Delta\).}
+  \end{subfigure}
+  %
+  \begin{subfigure}[b]{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \filldraw[color = gray!40, draw=black] (-1.5,-0.3) -- (1.5,-0.3) -- (1,0.3) -- (-1, 0.3) -- cycle;
+      \draw[->] (0,0) coordinate (o) -- (-1.2,1.2) coordinate (wi) node [pos=1.15] {\(\bm{\omega_i}\)};
+      \draw[->] (0,0)  --(1.2,1.2) coordinate (wo) node [pos=1.15] {\(\bm{\omega_o}\)};
+      \draw[->] (0,0) -- (0, 1.5) coordinate (n) node [above] {\(\bm n\)};
+      \filldraw (0,0) circle (1pt);
+      \draw pic["$\theta_{\bm o}$",draw=black,angle eccentricity=1.4,angle radius=0.8cm] {angle=n--o--wi};
+      \draw pic["$\theta_{\bm i}$",draw=black,angle eccentricity=1.4,angle radius=0.8cm] {angle=wo--o--n};
+    \end{tikzpicture}
+    \caption{Definition of \(\theta_{\bm o}\) and \(\theta_{\bm i}\).}
+  \end{subfigure}
+  \caption{Spherical reparameterization about \(\bm n\).}
+\end{figure}
+Geometrically, these parameters are defined as
 \begin{align*}
   \theta_{\bm i} &= \cos^{-1} \ip{\bm{\omega_i}, \bm n}\\
   \theta_{\bm o} &= \cos^{-1} \ip{\bm{\omega_o}, \bm n}\\
-  \phi_\Delta &= \cos^{-1}\del{\frac{\del{\bm{\omega_o} - \proj_{\bm n} \bm{\omega_o}} \cdot \del{\bm{\omega_i} - \proj_{\bm n} \bm{\omega_i}}}{\norm{\bm{\omega_o} - \proj_{\bm n} \bm{\omega_o}} \cdot \norm{\bm{\omega_i} - \proj_{\bm n} \bm{\omega_i}}}}
+  \phi_\Delta &= \cos^{-1}\del{\frac{\del{\bm{\omega_o} - \proj_{\bm n} \bm{\omega_o}} \cdot \del{\bm{\omega_i} - \proj_{\bm n} \bm{\omega_i}}}{\norm{\bm{\omega_o} - \proj_{\bm n} \bm{\omega_o}} \cdot \norm{\bm{\omega_i} - \proj_{\bm n} \bm{\omega_i}}}}.
 \end{align*}
 Thus, \(f_s\) is a function of \(\theta_{\bm i}\), \(\theta_{\bm o}\), and \(\phi_\Delta\) where
 \begin{enumerate}
@@ -275,6 +309,17 @@ Therefore, the microfacet distribution can be incorporated into the BSDF as
 
 Since it is physically reasonable to consider microfacets as being part of a continuous surface, then it is possible to model the surface in the neighborhood of a point as being defined by some height function \(z = f(x, y)\).
 However, these microscopic differences in height will cause the surface micro geometry to cast shadows on itself, thus it is possible for a ray \( \bm r\) to intersect with multiple micro facets.
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[domain=1:5,samples=200]
+    \draw[name path=surface] plot (\x, {0.3*sin(6*\x r)});
+    \draw[name path=ray,draw=none] (5,1) -- (1.4,-0.3);
+    \draw[thick,name intersections={of=ray and surface}, ->](5,1)--(intersection-3);
+    \draw[name intersections={of=ray and surface}, ->](intersection-3)--(1.4,-0.3);
+  \end{tikzpicture}
+  \caption{A ray intersecting with a micro surface multiple times.}
+\end{figure}
+
 To avoid double-counting, we must employ a corrective term.
 This term is known as the shadow masking function, \(G(\bm{\omega_i}, \bm{\omega_o}, \bm m)\), which describes what proportion of the micro facets with normal \(\bm m\) are visible simultaneously from directions \(\bm{\omega_i}\) and \(\bm{\omega_o}\).
 The Smith shadow masking function approximates \(G\) as the separable product two monodirectional masking terms
