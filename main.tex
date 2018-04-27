@@ -45,12 +45,12 @@ Ray tracers must accurately model the reflection of light off various materials 
     \includegraphics[width=0.5\textwidth]{figure1.png}
     \caption{Ray tracing}
 \end{figure}
-Forward ray tracing is a method that can accurately determine the appearance of a scene.
-It follows light particles from light sources to the observer.
-However, realistically only a paltry number of rays would end up at the observer, which makes this method highly inefficient to implement in practice.
+Forward ray tracing is a method that can accurately determine how electromagnetic power, known as radiance, is distributed through a scene by the objects in it.
+To do so, it follows light particles from light sources to the observer as they bounce around the scene.
+However, realistically only a paltry number of rays would end up at the observer (which to model a camera is usually small), which makes this method inefficient to implement in practice.
 
 To make the ray tracer more efficient, we have chosen to implement backward ray tracing.
-In backward ray tracing, the ray is created at the observer.
+In backward ray tracing, the ray is created at the observer and traced to a light source.
 The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the view plane where the ray was originally created.
 Due to Helmholtz reciprocity, when the light interacts with a surface the incoming and outgoing light can be swapped without changing the surface's appearance.
 Hence in ray tracing applications, these two ray tracing methods produce equivalent results.
@@ -80,7 +80,7 @@ The diagrams below illustrate the two ray tracing approaches.
 \end{figure}
 
 \noindent The goal of this project is to quantitatively compare the results of using importance sampling and uniform sampling ray tracing application.
-The a ray of light bounces at a surface, the uniform sampling method picks the next ray of a random direction in the light path, whereas importance sampling automatically selects a direction based on how much it will contribute to the radiance, hence the insignificant directions are selected less often.
+The a ray of light bounces at a surface, the uniform sampling method picks the next ray of a random direction in the light path, whereas importance sampling automatically selects a direction based on how much it will contribute to the output radiance of the material at that point, hence the insignificant directions are selected less often.
 In this project, we compare the convergence rate under uniform sampling and importance sampling methods by plotting the Root Mean Squared Error between the converged matrix and rendered matrices as a function of the number of samples.
     
 \section{Theory}
