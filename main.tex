@@ -439,6 +439,8 @@ To calculate the PDF of an inbound light direction, we must use the Jacobian of 
   P(\omega_{\bm i}) &= P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} } \norm{\dpd{\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}}{\bm{\omega_o}}}\\
    &= \frac{1}{4\abs{\ip{\bm{\omega_i}, \bm n}\ip{\bm{\omega_o}, \bm n}}}P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} }
 \end{align*}
+This yields the final PDF we use for importance sampling.
+
 \section{Implementation}
 
 To test various integration techniques, we wrote a small raytracer in \texttt{C++}.
