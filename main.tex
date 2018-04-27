@@ -73,7 +73,7 @@ To make the ray tracer more efficient, the method of backward ray tracing is imp
     
 \section{Theory}
 \subsection{Introduction: the rendering equation}
-The physical basis for all raytracers is the rendering equation, which can be written as\footnote{cite this}
+The physical basis for all raytracers is the rendering equation, which can be written as \autocite{kajiya1986rendering}
 \[L_{o}(\mathbf x, \bm {\omega_{o}}, \lambda, t) = L_{e}(\mathbf x, \bm{\omega_o}, \lambda, t) + \int_\Omega f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\ip{\bm n, \bm{\omega_i}} \dif \bm{\omega_i}\]
 
 where
@@ -237,9 +237,9 @@ Therefore, there exist several modifications to the BSDF which yield more accura
 
 In general, glossy surfaces do not reflect all incident light.
 In the case of dielectric materials, some light may be transmitted internally.
-In the case of conductors, incident light may be absorbed and converted into heat.
+In the case of conductors, incident light may be absorbed and converted into heat \autocite{scratchapixel_2014}.
 This phenomenon is described by the Fresnel term \(F(\theta_{\bm i})\) which calculates the fraction of reflected light as a function of the inbound angle.
-It takes the form\footnote{Cite this.}
+It takes the form \autocite{Pharr:2010:PBR:1854996}
 \[F(\theta_{\bm i}) = \frac{r_{\parallel}^2 + r_{\perp}^2}{2}\]
 where
 \begin{align*}
@@ -258,6 +258,7 @@ This allows is to simplify to
   r_{\perp} &= \norm{\frac{\sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2} - n_2\cos \theta_{\bm i}}{\sqrt{1 - \del{\frac{1}{n_2}\sin \theta_{\bm i}}^2} + n_2 \cos \theta_{\bm i}}}.
 \end{align*}
 The index of refraction of metals is canonically represented as \(n_2 = \eta + i\kappa\) where \(\eta\) is the traditional refractive index, and \(\kappa\) is the extinction coefficient.
+These values can be freely found for many metals online \autocite{rii}.
 Substituting this yields
 \begin{align*}
   r_{\parallel} &= \norm{\frac{\cos \theta_{\bm i} - \del{\eta + i\kappa} \sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2}}{\cos \theta_{\bm i} + \del{\eta + i\kappa} \sqrt{1 - \del{\frac{1}{\del{\eta + i\kappa}}\sin \theta_{\bm i}}^2}}}\\
@@ -293,7 +294,7 @@ In addition to changes in the amount of reflected light, many surfaces exhibit b
 This is due to microscopic variation in the surface.
 Therefore, the surface can be though of as consisting many tiny facets, each of which acts as its own ideal reflector, called microfacets.
 Many competing models for the distribution of orientations of the microfacet normals exist.
-We have chosen to implement the Trowbridge-Reitz microfacet distribution, which was shown to produce visually accurate results in \footnote{cite EGSR07}.
+We have chosen to implement the Trowbridge-Reitz microfacet distribution, which was shown to produce visually accurate results in \autocite{walter2007microfacet}
 It takes the form
 \[D(\bm m) = \frac{\alpha^2 \chi^+(\ip{\bm m, \bm n})}{\pi\del{\del{\alpha^2 - 1}\cos^2 \theta_{\bm m} + 1}^2}.\]
 where
@@ -352,7 +353,7 @@ This term is known as the shadow masking function, \(G(\bm{\omega_i}, \bm{\omega
 The Smith shadow masking function approximates \(G\) as the separable product two monodirectional masking terms
 \[G(\bm{\omega_i}, \bm{\omega_o}, \bm m) = G_1(\bm{\omega_i}, \bm m)G_1(\bm{\omega_i}, \bm m)\]
 The Smith shadow masking term is dependent on the microfacet distribution, \(D\).
-For the Trowbridge-Reitz distribution, \(G_1\) takes the form \autocite{walter2007microfacet}
+For the Trowbridge-Reitz distribution, \(G_1\) takes the form \autocite{hammon_2018}
 \[G_1(\bm v, \bm m) = \chi^2\del{\frac{\ip{\bm v, \bm m}}{\ip{\bm v, \bm n}}} \frac{2}{1 + \sqrt{1 + \alpha^2 \tan^2{\theta_{\bm v}}}}\]
 where
 \begin{enumerate}
@@ -416,7 +417,7 @@ Now, letting \(\xi_\theta \sim \mathcal{U}(0, 1)\) and inverting the CDF with re
 And finally from our isotropy assumption we draw \(\xi_\phi \sim \mathcal{U}(0, 1)\).
 Then
 \[\phi_\Delta = 2\pi\xi_\phi .\]
-Since we are sampling \(\bm m\), in practice we will sample a microfacet normal \( \bm m\) then convert it to an inbound light direction with
+Since we are sampling \(\bm m\), in practice we will sample a microfacet normal \( \bm m\) then convert it to an inbound light direction with \autocite{taylor_2016}
 \[2\abs{\ip{\bm{\omega_o}, \bm n}}\bm n-  \bm{\omega_o}\]
 To calculate the PDF of an inbound light direction, we must use the Jacobian of the transform like so
 \begin{align*}
@@ -488,4 +489,8 @@ We can see that in the case where the BSDF approaches a Dirac delta, a surface w
 As a result importance sampling is absolutely essential for raytracing in a practical setting.
 Fortunately, most BSDF are designed to yield fast importance samplers, so it is both mathematically practical and computationally inexpensive to implement importance sampling. 
 
+\nocite{jiayin_2017}
+\nocite{koenderink1996bidirectional}
+
+\printbibliography
 \end{document}
