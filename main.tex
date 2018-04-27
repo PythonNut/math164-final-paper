@@ -22,8 +22,11 @@
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{subcaption}
+\usepackage{savesym}
+\savesymbol{checkmark}
 \usepackage{dingbat}
 \usepackage{wasysym}
+\usepackage[capitalise]{cleveref}
 \usepackage[backend=biber,style=authoryear]{biblatex}
 \addbibresource{references.bib}
 
@@ -438,68 +441,79 @@ To calculate the PDF of an inbound light direction, we must use the Jacobian of 
    &= \frac{1}{4\abs{\ip{\bm{\omega_i}, \bm n}\ip{\bm{\omega_o}, \bm n}}}P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} }
 \end{align*}
 \section{Results}
-The scene we have rendered consists of a collection of spheres. The overhead light source is configured to emit light, the sphere at the back of the scene has metallic glossy surface while the sphere at the front has metallic matte surface, the walls in the scene are created with diffuse material properties and Lambertian reflectance properties, they reflect light uniformly in all directions. To render the image, the ray tracer calculates the color in every pixel at a given number of samples. The image created using importance sampling at 10,000 samples/pixel is taken as the converged image for result comparisons (Figure 6). Figure 7(a) shows an image rendered with importance sampling at 100 samples/pixel, figure 7(b) shows the image rendered at the same number of samples/pixel but used direct sampling method. \\
-Figure 7(c) is the same image as figure 6, which we regard as the converged image. It is rendered using importance sampling at 10,000 samples/pixels. Figure 7(b) show the image rendered also at 10,000 samples, but using uniform sampling. By examining the rendered images, we can see that importance sampling produces remarkably oimproved visual results.
+The scene we have rendered consists of a collection of spheres. The overhead light source is configured to emit light, the sphere at the back of the scene has metallic glossy surface while the sphere at the front has metallic matte surface, the walls in the scene are created with diffuse material properties and Lambertian reflectance properties, they reflect light uniformly in all directions.
+
+To render the image, the ray tracer calculates the color in every pixel at a given number of samples.
+The image created using importance sampling at 10,000 samples/pixel is taken as the converged image for result comparisons (\cref{result_converged}).
+\cref{result_is100} shows an image rendered with importance sampling at 100 samples/pixel, \cref{result_us100} shows the image rendered at the same number of samples/pixel but using uniform sampling.
+
+\cref{result_is10000} is the same image as \ref{result_converged}, which we regard as the converged image.
+It is rendered using importance sampling at 10,000 samples/pixels.
+\cref{result_us10000} show the image rendered also at 10,000 samples, but using uniform sampling.
+By examining the rendered images, we can see that importance sampling produces remarkably oimproved visual results.
 
 \begin{figure}[ht]
   \centering
-    \includegraphics[width=0.5\textwidth]{convergedIS.png}
-    \caption{converged final image, at 10,000 samples/pixel}
+  \includegraphics[width=0.5\textwidth]{convergedIS.png}
+  \caption{converged final image, at 10,000 samples/pixel}
+  \label{result_converged}
 \end{figure}
 
 \begin{figure}
-\centering
-\begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[width=.9\linewidth]{IS100.png}
-  \caption{Importance sampling, 100 samples}
-  \label{fig:sub1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.9\linewidth]{DS100.png}
-  \caption{Uniform sampling, 100 samples}
-  \label{fig:sub2}
-\end{subfigure}
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.9\linewidth]{convergedIS.png}
-  \caption{Importance sampling, 10,0000 samples}
-  \label{fig:sub1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=.9\linewidth]{10KDS.png}
-  \caption{Uiform sampling, 10,000 samples}
-  \label{fig:sub1}
-\end{subfigure}%
-\caption{render with and without importance sampling}
-\label{fig:test}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{IS100.png}
+    \caption{Importance sampling, 100 samples}
+    \label{result_is100}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{DS100.png}
+    \caption{Uniform sampling, 100 samples}
+    \label{result_us100}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{convergedIS.png}
+    \caption{Importance sampling, 10,000 samples}
+    \label{result_is10000}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=.9\linewidth]{10KDS.png}
+    \caption{Uiform sampling, 10,000 samples}
+    \label{result_us10000}
+  \end{subfigure}%
+  \caption{render with and without importance sampling}
+  \label{results}
 \end{figure}
 
-\noindent In order to quantitatively demonstrate the convergence rate between using direct and importance sampling techniques, we collected a sequence of images rendered under different number of samples for both cases. Since each image is comprised of a $768\times 1024$ matrix where every pixel stores a RGB value, by calculating the Mean Square Root Error $\alpha$ = $|$ Tn - I $|$ of every matrix in the sequence of the rendered images, where Tn is the converged matrix and I is the matrix generated at a given number of samples, we can plot the absolute Error versus the number of samples. Figure 4 shows the change in $\alpha_n$ as the number of samples increases in the case of using direct sampling, and figure 5 shows the case where importance sampling techniques are used.
+\noindent In order to quantitatively demonstrate the convergence rate between using uniform and importance sampling techniques, we collected a sequence of images rendered under different number of samples for both cases. Since each image is comprised of a $768\times 1024$ matrix where every pixel stores a RGB value, by calculating the Mean Square Root Error $\alpha$ = $|$ Tn - I $|$ of every matrix in the sequence of the rendered images, where Tn is the converged matrix and I is the matrix generated at a given number of samples, we can plot the absolute Error versus the number of samples. \cref{result_us_curve} shows the change in $\alpha_n$ as the number of samples increases in the case of using uniform sampling, and \cref{result_is_curve} shows the case where importance sampling techniques are used.
 
 \begin{figure}[H]
   \centering
-    \includegraphics[width=0.9\textwidth]{DS1000.png}
-    \caption{Uniform sampling, 1000 samples}
+  \includegraphics[width=0.9\textwidth]{DS1000.png}
+  \caption{Uniform sampling, 1000 samples}
+  \label{result_us_curve}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-    \includegraphics[width=0.9\textwidth]{IS1000.png}
-    \caption{Importance sampling, 1000 samples}
+  \includegraphics[width=0.9\textwidth]{IS1000.png}
+  \caption{Importance sampling, 1000 samples}
+  \label{result_is_curve}
 \end{figure}
 
-In figure 4, the value of the absolute error after 1000 samples is about 1100, suggesting that for this rendering to converge, it will require a significantly larger number of samples. On the other hand, when importance sampling techniques are used in the rendering, by the time of 1000 samples, the value of absolute error is about 980. 
-Although this difference may not seem numerically significant, the visual implications of this difference are quite stark.
-
-We hypothesize that the failure of the importance sampled algorithm to converge was due to a mistake in luminance clamping on our part. 
-We intend to address this issue in the future.
+In \cref{result_us_curve}, the mean squared error after 1000 samples is about 150, suggesting that for this rendering to converge, it will require a significantly larger number of samples.
+On the other hand, when importance sampling techniques are used in the rendering, by the time of 1000 samples, the mean squared error is about 50, or three times lower.
+Additionally, it is clear that the uniformly sampled image is still very far from resolving the glossy metallic surfaces correctly, and that the more matte metal surface is converging faster.
+This agrees with our intuition that uniformly sampling a near Dirac delta distribution will lead to bad results if not done with importance sampling.
 
 \section{Discussion}
 
-We can see that in the case where the BSDF approaches a Dirac delta, a surface without importance sampling may never converge within a reasonable number of samples.
+We hypothesize that in the case where the BSDF approaches a Dirac delta, a surface without importance sampling may never converge within a reasonable number of samples.
+This would be due to floating point errors in our program, as mathematically uniform and importance sampling must converge to the same result in the limit.
 As a result importance sampling is absolutely essential for raytracing in a practical setting.
 Fortunately, most BSDF are designed to yield fast importance samplers, so it is both mathematically practical and computationally inexpensive to implement importance sampling. 
 
