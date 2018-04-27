@@ -110,10 +110,10 @@ For scenes of any reasonable complexity, this produces a system that is too comp
 Therefore, it is appropriate to compute an approximate solution to the rendering equation using Monte Carlo methods.
 Raytracers operate by explicitly tracing light paths through the scene.
 By averaging over enough paths, they can produce a highly accurate approximate solutions to the rendering equation.
-In this paper, we have chosen to implement forward path tracing.
+As stated before, we have chosen to implement forward path tracing.
 In this method, light rays start at the observer and bounce through the scene until they encounter a light.
 This is the opposite of the normal intuition involving light, as photons themselves travel from light sources to the observer.
-However, due to Helmholtz reciprocity, the result is the same.
+However, due to Helmholtz Reciprocity, the result remains the same.
 The advantage of this method over tracing light from light sources to the observer is that it is easier to control the sampling distribution of rays with respect to the observer, which generally leads to more straightforward convergence.
 
 The path tracing algorithm can be described by the following highly simplified psuedo code
