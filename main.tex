@@ -30,11 +30,13 @@
 \begin{document}
 \maketitle
 \begin{abstract}\noindent
-This report presents importance sampling techniques for Monte Carlo integration in the context of ray tracer design. The rendered images are compared quantitatively to determine which techniques result in faster convergence rates. The ray-tracing rendering equation, ray reflection calculations and detailed mathematical implementation for the importance sampling techniques are discussed in the theory section. Finally, the report concludes with a summary of the results and discussion for future work.
+This paper presents the physical and mathematical theories behind a Monte Carlo ray tracer as well as the implementation of several importance sampling techniques. The rendered ray-tracing images are compared quantitatively with the converged image to demonstrate the difference in convergence rate between using uniform sampling and importance sampling approaches. The paper concludes with a summary of the results and discussion of future work.
 \end{abstract}
 
 \section{Introduction}
-Ray tracing is a computer graphics technique that creates images by tracing the path of light from a pixel as it intersects with the objects in the scene, the ray tracer calculates how much light is reflected back along the ray to determine the color of the pixel. Figure 1 illustrates the working principle of the ray tracer we are going to implement. \\
+Ray tracing is a rendering technique for generating digital images by simulating how light would interact with the objects in the virtual scene. When a ray of light bounces off a surface, new rays of light are created, the ray tracer calculates all of the rays on a path. \\\\
+Forward ray tracing is a method that can most accurately determine the coloring of each object. It follows light particles from the light source to the objects and calculates the rays of light that arrive at the eye. However, realistically only a paltry number of rays would end up at the viewer's eyes, which makes this method highly inefficient to implement in practice.\\\\
+To make the ray tracer more efficient, the method of backward ray tracing is implemented. In backward ray tracing, the ray is created at the viewer's eye, the first object this ray arrives at will be visible to the viewer. The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the vewplane which the ray leaves 
 \begin{figure}[ht]
   \centering
     \includegraphics[width=0.5\textwidth]{figure1.png}
