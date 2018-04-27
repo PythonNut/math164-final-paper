@@ -22,6 +22,8 @@
 \usepackage{tikz}
 \usepackage{float}
 \usepackage{subcaption}
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{references.bib}
 
 \usetikzlibrary{quotes, angles, intersections}
 \setlength{\droptitle}{-10em}
@@ -34,14 +36,37 @@ This paper presents the physical and mathematical theories behind a Monte Carlo 
 \end{abstract}
 
 \section{Introduction}
-Ray tracing is a rendering technique for generating digital images by simulating how light would interact with the objects in the virtual scene. When a ray of light bounces off a surface, new rays of light are created, the ray tracer calculates all of the rays on a path. \\\\
-Forward ray tracing is a method that can most accurately determine the coloring of each object. It follows light particles from the light source to the objects and calculates the rays of light that arrive at the eye. However, realistically only a paltry number of rays would end up at the viewer's eyes, which makes this method highly inefficient to implement in practice.\\\\
-To make the ray tracer more efficient, the method of backward ray tracing is implemented. In backward ray tracing, the ray is created at the viewer's eye, the first object this ray arrives at will be visible to the viewer. The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the viewplane where the ray 
+Ray tracing is a rendering technique for generating digital images by simulating how light would interact with the objects in the virtual scene. When a ray of light bounces off a surface, new rays of light are created, the ray tracer calculates all of the rays on a path. \\
 \begin{figure}[ht]
   \centering
     \includegraphics[width=0.5\textwidth]{figure1.png}
     \caption{Ray tracing}
 \end{figure}
+Forward ray tracing is a method that can most accurately determine the coloring of each object. It follows light particles from the light source to the objects and calculates the rays of light that arrive at the eye. However, realistically only a paltry number of rays would end up at the viewer's eyes, which makes this method highly inefficient to implement in practice.\\\\
+To make the ray tracer more efficient, the method of backward ray tracing is implemented in this project. In backward ray tracing, the ray is created at the viewer's eye, the first object this ray arrives at will be visible to the viewer. The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the view plane where the ray was created. The diagrams below illustrate the two ray tracing approaches. \\
+ \begin{figure}[H]
+      \centering
+      \begin{tikzpicture}
+        \filldraw[color = gray!40, draw=black] (-1.4,-0.4) -- (-0.6,-0.5) -- (-0.6,0.5) -- (-1.4, 0.4) -- cycle;
+        \draw[thick] (-1,0) -- (-3,-1) node[midway, below] {\(\bm{\omega_i}\)};
+        \draw[->] (-1,0)  --(-3,1.2) node[midway, above] {\(\bm{\omega_o}\)};
+        \draw[->] (-1,0)  --(-3,1);
+        \draw[->] (-1,0)  --(-3,0.8);
+      \end{tikzpicture}
+      \caption{\textbf{Forward path tracing}, i.e. trace ``light rays'' from lights to eye.}
+    \end{figure}
+    
+    \begin{figure}[H]
+      \centering
+      \begin{tikzpicture}
+        \filldraw[color = gray!40, draw=black] (-1.4,-0.4) -- (-0.6,-0.5) -- (-0.6,0.5) -- (-1.4, 0.4) -- cycle;
+        \draw[->] (-1,0) -- (-3,-0.8);
+        \draw[->] (-1,0) -- (-3,-1); 
+        \draw[->] (-1,0) -- (-3,-1.2) node[midway, below] {\(\bm{\omega_i}\)};
+        \draw[thick] (-1,0)  --(-3,1) node[midway, above] {\(\bm{\omega_o}\)};
+      \end{tikzpicture}
+      \caption{\textbf{Backward path tracing}, i.e. trace ``eye rays'' from eye to lights.}
+    \end{figure}
 
 \noindent The goal of this project is to quantitatively compare the results of introducing importance sampling in a ray tracing model. Instead of picking a random direction for the next ray in the light path, importance sampling lets the model  automatically select a direction based on how much it will contribute to the radiance, hence the insignificant directions are selected less often, resulting in faster convergence rate of the image. In this project, we compare the convergence rate under direct sampling and importance sampling methods by plotting the Root Mean Squared Error between the converged matrix and rendered matrices at different number of samples.
 \newline
