@@ -437,14 +437,13 @@ To calculate the PDF of an inbound light direction, we must use the Jacobian of 
    &= \frac{1}{4\abs{\ip{\bm{\omega_i}, \bm n}\ip{\bm{\omega_o}, \bm n}}}P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} }
 \end{align*}
 \section{Results}
-The scene we have rendered consists of a collection of spheres. The overhead light source is configured to emit light, the sphere at the back of the scene has metallic glossy surface while the sphere at the front has metallic matte surface, the walls in the scene are created with diffuse material properties and Lambertian reflectance properties, they reflect light uniformly in all directions. To render the image, the raytracer calculates the color in every pixel at a given number of samples. The image created using importance sampling techniques at 10,000 samples/pixel is taken as the converged image for result comparisons (Figure 2). Figure 7(a) shows an image rendered with importance sampling at 100 samples/pixel, figure 7(b) shows the image rendered at the same number of samples/pixel but used direct sampling method. \\
-Figure 7(c) is the same as figure 6, which we regard as the converged image. It is rendered at 10,000 samples/pixels using importance sampling. 
-
+The scene we have rendered consists of a collection of spheres. The overhead light source is configured to emit light, the sphere at the back of the scene has metallic glossy surface while the sphere at the front has metallic matte surface, the walls in the scene are created with diffuse material properties and Lambertian reflectance properties, they reflect light uniformly in all directions. To render the image, the ray tracer calculates the color in every pixel at a given number of samples. The image created using importance sampling at 10,000 samples/pixel is taken as the converged image for result comparisons (Figure 6). Figure 7(a) shows an image rendered with importance sampling at 100 samples/pixel, figure 7(b) shows the image rendered at the same number of samples/pixel but used direct sampling method. \\
+Figure 7(c) is the same image as figure 6, which we regard as the converged image. It is rendered using importance sampling at 10,000 samples/pixels. Figure 7(b) show the image rendered also at 10,000 samples, but using uniform sampling. By examining the rendered images, we can see that importance sampling produces remarkably oimproved visual results.
 
 \begin{figure}[ht]
   \centering
     \includegraphics[width=0.5\textwidth]{convergedIS.png}
-    \caption{converged final image}
+    \caption{converged final image, at 10,000 samples/pixel}
 \end{figure}
 
 \begin{figure}
@@ -482,7 +481,7 @@ Figure 7(c) is the same as figure 6, which we regard as the converged image. It 
 \begin{figure}[H]
   \centering
     \includegraphics[width=0.9\textwidth]{DS1000.png}
-    \caption{Direct sampling, 1000 samples}
+    \caption{Uniform sampling, 1000 samples}
 \end{figure}
 
 \begin{figure}[H]
