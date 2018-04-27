@@ -519,7 +519,7 @@ This agrees with our intuition that uniformly sampling a near Dirac delta distri
 \section{Discussion}
 
 We hypothesize that in the case where the BSDF approaches a Dirac delta, a surface without importance sampling may never converge within a reasonable number of samples.
-This would be due to floating point errors in our program, as mathematically uniform and importance sampling must converge to the same result in the limit.
+This would be due to cumulative floating point error in our program, as mathematically, uniform and importance sampling must converge to the same result in the limit.
 As a result importance sampling is absolutely essential for raytracing in a practical setting.
 Fortunately, most BSDF are designed to yield fast importance samplers, so it is both mathematically practical and computationally inexpensive to implement importance sampling. 
 
