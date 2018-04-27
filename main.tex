@@ -440,10 +440,16 @@ To calculate the PDF of an inbound light direction, we must use the Jacobian of 
   P(\omega_{\bm i}) &= P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} } \norm{\dpd{\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}}}}{\bm{\omega_o}}}\\
    &= \frac{1}{4\abs{\ip{\bm{\omega_i}, \bm n}\ip{\bm{\omega_o}, \bm n}}}P_{\bm m}\del{\frac{\bm{\omega_i} + \bm{\omega_o}}{\norm{\bm{\omega_i} + \bm{\omega_o}}} }
 \end{align*}
-\section{Results}
+\section{Implementation}
+
+To test various integration techniques, we wrote a small raytracer in \texttt{C++}.
+It can be found at \url{https://github.com/PythonNut/math164-raytracer}.
+In particular, it implements backward path tracing with optional importance sampling along with Lambertian and GGX materials.
+
 The scene we have rendered consists of a collection of spheres. The overhead light source is configured to emit light, the sphere at the back of the scene has metallic glossy surface while the sphere at the front has metallic matte surface, the walls in the scene are created with diffuse material properties and Lambertian reflectance properties, they reflect light uniformly in all directions.
 
 To render the image, the ray tracer calculates the color in every pixel at a given number of samples.
+\section{Results}
 The image created using importance sampling at 10,000 samples/pixel is taken as the converged image for result comparisons (\cref{result_converged}).
 \cref{result_is100} shows an image rendered with importance sampling at 100 samples/pixel, \cref{result_us100} shows the image rendered at the same number of samples/pixel but using uniform sampling.
 
