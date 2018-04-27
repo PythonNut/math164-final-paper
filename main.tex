@@ -81,11 +81,10 @@ In backward ray tracing, the ray is created at the observer and traced to a ligh
 The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the view plane where the ray was originally created.
 Due to Helmholtz reciprocity, when the light interacts with a surface the incoming and outgoing light can be swapped without changing the surface's appearance.
 Hence in ray tracing applications, these two ray tracing methods produce equivalent results.
-The diagrams below illustrate the two ray tracing approaches.
 
 The goal of this project is to quantitatively compare the results of using importance sampling and uniform sampling ray tracing application.
-The a ray of light bounces at a surface, the uniform sampling method picks the next ray of a random direction in the light path, whereas importance sampling automatically selects a direction based on how much it will contribute to the output radiance of the material at that point, hence the insignificant directions are selected less often.
-In this project, we compare the convergence rate under uniform sampling and importance sampling methods by plotting the Root Mean Squared Error between the converged matrix and rendered matrices as a function of the number of samples.
+When a ray of light bounces at a surface, the uniform sampling method picks the next ray of a random direction in the light path, whereas importance sampling automatically selects a direction based on how much it will contribute to the output radiance of the material at that point, hence the insignificant directions are selected less often.
+In this project, we compare the convergence rate under uniform sampling and importance sampling methods by plotting the Root Mean Squared Error between the converged matrix and rendered matrices as a function of the number of samples/pixel.
     
 \section{Theory}
 \subsection{Introduction: the rendering equation}
@@ -119,7 +118,7 @@ This is the opposite of the normal intuition involving light, as photons themsel
 However, due to Helmholtz Reciprocity, the result remains the same.
 The advantage of this method over tracing light from light sources to the observer is that it is easier to control the sampling distribution of rays with respect to the observer, which generally leads to more straightforward convergence.
 
-The path tracing algorithm can be described by the following highly simplified psuedo code
+The path tracing algorithm can be described by the following simplified psuedo code
 \begin{lstlisting}
 def radiance(ray):
     if the recursion depth is above a certain threshold:
@@ -195,7 +194,7 @@ Thus, \(f_s\) is a function of \(\theta_{\bm i}\), \(\theta_{\bm o}\), and \(\ph
 \end{enumerate}
 
 \subsubsection{Integrating the BSDF with importance sampling}
-Returning to the rendering equation, we see that in general while path tracing we have no knowledge of the distribution of \(L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\).
+Returning to the rendering equation, we see that in general in path tracing we have no knowledge of the distribution of \(L_i(\mathbf x, \bm{\omega_i}, \lambda, t)\).
 However, since we know the material properties, we have complete knowledge of the distribution of \(f_s(\mathbf x, \bm{\omega_i}, \bm{\omega_o}, \lambda, t)\ip{\bm n, \bm{\omega_i}} = f_s(\theta_{\bm i}, \theta_{\bm o}, \phi_\Delta)\cos \theta_{\bm i}\).
 Therefore, we can use the knowledge of the BSDF distribution to perform importance sampling of the light paths while path tracing, allowing the approximation to converge faster.
 
