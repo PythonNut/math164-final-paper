@@ -36,7 +36,7 @@ This paper presents the physical and mathematical theories behind a Monte Carlo 
 \section{Introduction}
 Ray tracing is a rendering technique for generating digital images by simulating how light would interact with the objects in the virtual scene. When a ray of light bounces off a surface, new rays of light are created, the ray tracer calculates all of the rays on a path. \\\\
 Forward ray tracing is a method that can most accurately determine the coloring of each object. It follows light particles from the light source to the objects and calculates the rays of light that arrive at the eye. However, realistically only a paltry number of rays would end up at the viewer's eyes, which makes this method highly inefficient to implement in practice.\\\\
-To make the ray tracer more efficient, the method of backward ray tracing is implemented. In backward ray tracing, the ray is created at the viewer's eye, the first object this ray arrives at will be visible to the viewer. The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the viewplane 
+To make the ray tracer more efficient, the method of backward ray tracing is implemented. In backward ray tracing, the ray is created at the viewer's eye, the first object this ray arrives at will be visible to the viewer. The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the viewplane where the ray 
 \begin{figure}[ht]
   \centering
     \includegraphics[width=0.5\textwidth]{figure1.png}
