@@ -37,40 +37,51 @@
 \end{abstract}
 
 \section{Introduction}
-Ray tracing is a rendering technique for generating digital images by simulating how light would interact with the objects in the virtual scene. When a ray of light bounces off a surface, new rays of light are created, the ray tracer calculates all of the rays on a path. \\
+Ray tracing is a rendering technique for generating digital images by simulating how light would interact with objects in a virtual scene.
+When a ray of light bounces off a surface, the light is reflected.
+Ray tracers must accurately model the reflection of light off various materials to create realistic images.
 \begin{figure}[ht]
   \centering
     \includegraphics[width=0.5\textwidth]{figure1.png}
     \caption{Ray tracing}
 \end{figure}
-Forward ray tracing is a method that can most accurately determine the coloring of each object. It follows light particles from the light source to the objects and calculates the rays of light that arrive at the eye. However, realistically only a paltry number of rays would end up at the viewer's eyes, which makes this method highly inefficient to implement in practice.\\\\
-To make the ray tracer more efficient, the method of backward ray tracing is implemented in this project. In backward ray tracing, the ray is created at the viewer's eye, the first object this ray arrives at will be visible to the viewer. The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the view plane where the ray was originally created. Given Helmholtz reciprocity principle, when the light interacts with a surface, the incoming and outgoing light can be considered as reversal of each other. Hence in ray tracing applications, these two ray tracing methods produce equivalent outcome. The diagrams below illustrate the two ray tracing approaches. \\
- \begin{figure}[H]
-      \centering
-      \begin{tikzpicture}
-        \filldraw[color = gray!40, draw=black] (-1.4,-0.4) -- (-0.6,-0.5) -- (-0.6,0.5) -- (-1.4, 0.4) -- cycle;
-        \draw[thick] (-1,0) -- (-3,-1) node[midway, below] {\(\bm{\omega_i}\)};
-        \draw[->] (-1,0)  --(-3,1.2) node[midway, above] {\(\bm{\omega_o}\)};
-        \draw[->] (-1,0)  --(-3,1);
-        \draw[->] (-1,0)  --(-3,0.8);
-      \end{tikzpicture}
-      \caption{\textbf{Forward path tracing}, i.e. trace ``light rays'' from lights to eye.}
-    \end{figure}
-    
-    \begin{figure}[H]
-      \centering
-      \begin{tikzpicture}
-        \filldraw[color = gray!40, draw=black] (-1.4,-0.4) -- (-0.6,-0.5) -- (-0.6,0.5) -- (-1.4, 0.4) -- cycle;
-        \draw[->] (-1,0) -- (-3,-0.8);
-        \draw[->] (-1,0) -- (-3,-1); 
-        \draw[->] (-1,0) -- (-3,-1.2) node[midway, below] {\(\bm{\omega_i}\)};
-        \draw[thick] (-1,0)  --(-3,1) node[midway, above] {\(\bm{\omega_o}\)};
-      \end{tikzpicture}
-      \caption{\textbf{Backward path tracing}, i.e. trace ``eye rays'' from eye to lights.}
-    \end{figure}
+Forward ray tracing is a method that can accurately determine the appearance of a scene.
+It follows light particles from light sources to the observer.
+However, realistically only a paltry number of rays would end up at the observer, which makes this method highly inefficient to implement in practice.
 
-\noindent The goal of this project is to quantitatively compare the results of using importance sampling and uniform sampling ray tracing application. The a ray of light bounces at a surface, the uniform sampling method picks the next ray of a random direction in the light path, whereas importance sampling automatically selects a direction based on how much it will contribute to the radiance, hence the insignificant directions are selected less often. In this project, we compare the convergence rate under uniform sampling and importance sampling methods by plotting the Root Mean Squared Error between the converged matrix and rendered matrices at different number of samples.
-\newline
+To make the ray tracer more efficient, we have chosen to implement backward ray tracing.
+In backward ray tracing, the ray is created at the observer.
+The ray tracer follows this ray and as it bounces in the scene, and calculates the coloring of the particular point in the view plane where the ray was originally created.
+Due to Helmholtz reciprocity, when the light interacts with a surface the incoming and outgoing light can be swapped without changing the surface's appearance.
+Hence in ray tracing applications, these two ray tracing methods produce equivalent results.
+The diagrams below illustrate the two ray tracing approaches.
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \filldraw[color = gray!40, draw=black] (-1.4,-0.4) -- (-0.6,-0.5) -- (-0.6,0.5) -- (-1.4, 0.4) -- cycle;
+    \draw[thick] (-1,0) -- (-3,-1) node[midway, below] {\(\bm{\omega_i}\)};
+    \draw[->] (-1,0)  --(-3,1.2) node[midway, above] {\(\bm{\omega_o}\)};
+    \draw[->] (-1,0)  --(-3,1);
+    \draw[->] (-1,0)  --(-3,0.8);
+  \end{tikzpicture}
+  \caption{\textbf{Forward path tracing}, i.e. trace ``light rays'' from lights to eye.}
+\end{figure}
+    
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \filldraw[color = gray!40, draw=black] (-1.4,-0.4) -- (-0.6,-0.5) -- (-0.6,0.5) -- (-1.4, 0.4) -- cycle;
+    \draw[->] (-1,0) -- (-3,-0.8);
+    \draw[->] (-1,0) -- (-3,-1);
+    \draw[->] (-1,0) -- (-3,-1.2) node[midway, below] {\(\bm{\omega_i}\)};
+    \draw[thick] (-1,0)  --(-3,1) node[midway, above] {\(\bm{\omega_o}\)};
+  \end{tikzpicture}
+  \caption{\textbf{Backward path tracing}, i.e. trace ``eye rays'' from eye to lights.}
+\end{figure}
+
+\noindent The goal of this project is to quantitatively compare the results of using importance sampling and uniform sampling ray tracing application.
+The a ray of light bounces at a surface, the uniform sampling method picks the next ray of a random direction in the light path, whereas importance sampling automatically selects a direction based on how much it will contribute to the radiance, hence the insignificant directions are selected less often.
+In this project, we compare the convergence rate under uniform sampling and importance sampling methods by plotting the Root Mean Squared Error between the converged matrix and rendered matrices as a function of the number of samples.
     
 \section{Theory}
 \subsection{Introduction: the rendering equation}
